@@ -1,0 +1,4 @@
+*.o
+*.cf
+smoke_test
+work-obj*.cf

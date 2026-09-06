@@ -94,8 +94,6 @@ begin
 
     file_close(input_file);
     file_close(output_file);
-
-    wait;
   end process;
 
 end behave;

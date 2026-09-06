@@ -15,7 +15,7 @@ fi
 
 mkdir -p $WORKDIR
 
-ghdl -a --workdir=$WORKDIR src/${MODULE}.vhd
+ghdl -a --workdir=$WORKDIR src/${MODULE}.vhd 
 ghdl -a --workdir=$WORKDIR sim/${MODULE}_tb.vhd
 ghdl -e --workdir=$WORKDIR ${MODULE}_tb
 ghdl -r --workdir=$WORKDIR ${MODULE}_tb --stop-time=$STOP_TIME

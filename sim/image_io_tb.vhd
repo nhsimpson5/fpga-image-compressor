@@ -95,5 +95,4 @@ begin
     file_close(input_file);
     file_close(output_file);
   end process;
-
 end behave;

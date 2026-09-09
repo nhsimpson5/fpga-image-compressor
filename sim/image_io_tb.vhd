@@ -7,26 +7,58 @@ entity image_io_tb is
 end image_io_tb;
 
 architecture behave of image_io_tb is
-
+  --constants 
+  constant MAX_WIDTH : integer := 16;
+  constant COUNT_BITS : integer := 5;
+  --signals
   signal CLK : std_logic := '0';
-  signal D   : std_logic_vector(7 downto 0);
-  signal Q   : std_logic_vector(7 downto 0);
+  signal row_width : integer range 0 to MAX_WIDTH;
+  signal pixel_in  : std_logic_vector(7 downto 0);
+  signal value_out : std_logic_vector(7 downto 0);
+  signal count_out : std_logic_vector(COUNT_BITS - 1 downto 0);
+  signal out_valid : std_logic;
 
-  component pixel_register is
-    port(
-      clk : in  std_logic;
-      d   : in  std_logic_vector(7 downto 0);
-      q   : out std_logic_vector(7 downto 0)
+  component rle_encoder is
+    generic (
+      MAX_WIDTH  : integer;
+      COUNT_BITS : integer 
     );
-  end component pixel_register;
+    port(
+    clk       : in  std_logic;
+    row_width : in  integer range 0 to MAX_WIDTH;
+    pixel_in  : in  std_logic_vector(7 downto 0);
+    value_out : out std_logic_vector(7 downto 0);
+    count_out : out std_logic_vector(COUNT_BITS - 1 downto 0);
+    out_valid : out std_logic
+    );
+  end component rle_encoder;
+
+  procedure write_rle(
+    variable out_line   : inout line;
+    constant value_out  : in std_logic_vector(7 downto 0);
+    constant count_out  : in std_logic_vector(COUNT_BITS - 1 downto 0)
+  ) is
+  begin
+    write(out_line, to_integer(unsigned(count_out)));
+    write(out_line, string'(" "));
+    write(out_line, to_integer(unsigned(value_out)));
+    write(out_line, string'(" "));
+  end procedure;
 
 begin
 
-  uut: pixel_register
+  uut: rle_encoder
+    generic map (
+      MAX_WIDTH => MAX_WIDTH,
+      COUNT_BITS => COUNT_BITS
+    )
     port map (
       clk => CLK,
-      d   => D,
-      q   => Q
+      row_width => row_width,
+      pixel_in => pixel_in,
+      value_out => value_out,
+      count_out => count_out,
+      out_valid => out_valid
     );
 
   CLK <= not CLK after 10 ns;
@@ -38,31 +70,28 @@ begin
     variable out_status   : file_open_status;
     variable l            : line;
     variable out_line     : line;
-    variable magic        : string(1 to 2);
     variable width        : integer;
     variable height       : integer;
     variable maxval       : integer;
     variable pixel_value  : integer;
-    variable output_pixel : integer;
   begin
 
-    file_open(in_status, input_file, "images/gradient_8x8.pgm", read_mode);
+    file_open(in_status, input_file, "images/plus_16x16.pgm", read_mode);
     assert in_status = open_ok report "Failed to open input file" severity failure;
 
-    file_open(out_status, output_file, "sim/output/gradient_8x8_out.pgm", write_mode);
+    file_open(out_status, output_file, "sim/output/plus_16x16.rle", write_mode);
     assert out_status = open_ok report "Failed to open output file" severity failure;
 
     readline(input_file, l);
-    read(l, magic);
-
     readline(input_file, l);
     read(l, width);
+    row_width <= width;
     read(l, height);
 
     readline(input_file, l);
     read(l, maxval);
 
-    write(out_line, magic);
+    write(out_line, string'("RLE1"));
     writeline(output_file, out_line);
 
     write(out_line, width);
@@ -77,22 +106,25 @@ begin
       readline(input_file, l);
       for col in 0 to width - 1 loop
         read(l, pixel_value);
-        D <= std_logic_vector(to_unsigned(pixel_value, D'length));
+        pixel_in <= std_logic_vector(to_unsigned(pixel_value, pixel_in'length));
         wait until rising_edge(CLK);
         wait for 1 ns;
-        output_pixel := to_integer(unsigned(Q));
-        assert output_pixel = pixel_value
-        report "output_pixel(" & integer'image(output_pixel) & ") doesn't equal pixel_value (" & integer'image(pixel_value) & ")" 
-        severity error;
-        write(out_line, output_pixel);
-        write(out_line, string'(" "));
+        if out_valid = '1' then
+          write_rle(out_line, value_out, count_out);
+        end if;
       end loop;
-      writeline(output_file, out_line);
+      wait until rising_edge(CLK);
+      wait for 1 ns;
+      if out_valid = '1' then
+          write_rle(out_line, value_out, count_out);
+      end if;
+      writeline(output_file, out_line); 
     end loop;
     
     report "image dimensions processed";
 
     file_close(input_file);
     file_close(output_file);
+    wait;
   end process;
 end behave;

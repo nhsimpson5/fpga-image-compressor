@@ -64,22 +64,24 @@ begin
   CLK <= not CLK after 10 ns;
 
   process is
-    file input_file      : text;
-    file output_file     : text;
-    variable in_status    : file_open_status;
-    variable out_status   : file_open_status;
-    variable l            : line;
-    variable out_line     : line;
-    variable width        : integer;
-    variable height       : integer;
-    variable maxval       : integer;
-    variable pixel_value  : integer;
+    file input_file             : text;
+    file output_file            : text;
+    variable in_status          : file_open_status;
+    variable out_status         : file_open_status;
+    variable l                  : line;
+    variable out_line           : line;
+    variable width              : integer;
+    variable height             : integer;
+    variable maxval             : integer;
+    variable pixel_value        : integer;
+    variable compression_ratio  : real;
+    variable pair_total         : integer := 0;
   begin
 
-    file_open(in_status, input_file, "images/plus_16x16.pgm", read_mode);
+    file_open(in_status, input_file, "images/gradient_8x8.pgm", read_mode);
     assert in_status = open_ok report "Failed to open input file" severity failure;
 
-    file_open(out_status, output_file, "sim/output/plus_16x16.rle", write_mode);
+    file_open(out_status, output_file, "sim/output/gradient_8x8.rle", write_mode);
     assert out_status = open_ok report "Failed to open output file" severity failure;
 
     readline(input_file, l);
@@ -111,16 +113,20 @@ begin
         wait for 1 ns;
         if out_valid = '1' then
           write_rle(out_line, value_out, count_out);
+          pair_total := pair_total + 1;
         end if;
       end loop;
       wait until rising_edge(CLK);
       wait for 1 ns;
       if out_valid = '1' then
           write_rle(out_line, value_out, count_out);
+          pair_total := pair_total + 1;
       end if;
       writeline(output_file, out_line); 
     end loop;
-    
+
+    compression_ratio := real(width*height*8) / real(pair_total*13); --8 bits per pixel, 5 bits per count
+    report "compression ratio: " & real'image(compression_ratio);
     report "image dimensions processed";
 
     file_close(input_file);

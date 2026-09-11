@@ -125,8 +125,8 @@ architecture behave of rle_encoder_tb is
         variable result_index : integer := 0;
     begin
         row_width <= pixels'length;
-        for j in pixels'range loop
-            pixel_in <= pixels(j);
+        for i in pixels'range loop
+            pixel_in <= pixels(i);
             wait until rising_edge(clk);
             wait for 1 ns;
             if out_valid = '1' then

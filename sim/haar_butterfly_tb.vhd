@@ -22,18 +22,19 @@ architecture behave of haar_butterfly_tb is
         );
         end component haar_butterfly;
 
-    type test_array is array (natural range <>) of integer;
     -- test arrays
-    constant test_array_a : test_array := (
+    type test_vector is array (natural range <>) of integer;
+    
+    constant test_vector_a : test_vector := (
         12, 13, 100, 255, 0, 255, 0, 200
     );
-    constant test_array_b : test_array := (
+    constant test_vector_b : test_vector := (
         14, 14, 100, 0, 255, 255, 0, 3
     );
-    constant test_array_d : test_array := (
+    constant test_vector_d : test_vector := (
         -2, -1, 0, 255, -255, 0, 0, 197
     );
-    constant test_array_s : test_array := (
+    constant test_vector_s : test_vector := (
         13, 13, 100, 127, 127, 255, 0, 101
     );
     
@@ -48,15 +49,15 @@ begin
 
     process is
     begin
-    for i in 0 to test_array_a'length - 1 loop
-        a_in <= std_logic_vector(to_unsigned(test_array_a(i), 8));
-        b_in <= std_logic_vector(to_unsigned(test_array_b(i), 8));
+    for i in 0 to test_vector_a'length - 1 loop
+        a_in <= std_logic_vector(to_unsigned(test_vector_a(i), 8));
+        b_in <= std_logic_vector(to_unsigned(test_vector_b(i), 8));
         wait for 1 ns;
-        assert d_out = std_logic_vector(to_signed(test_array_d(i), 9))
-        report "test vector " & integer'image(i + 1) & " failed: gave d = " & integer'image(to_integer(signed(d_out))) & ", should have given d = " & integer'image(test_array_d(i))
+        assert d_out = std_logic_vector(to_signed(test_vector_d(i), 9))
+        report "test vector " & integer'image(i + 1) & " failed: gave d = " & integer'image(to_integer(signed(d_out))) & ", should have given d = " & integer'image(test_vector_d(i))
         severity error;
-        assert s_out = std_logic_vector(to_unsigned(test_array_s(i), 8))
-        report "test vector " & integer'image(i + 1) & " failed: gave s = " & integer'image(to_integer(unsigned(s_out))) & ", should have given s = " & integer'image(test_array_s(i))
+        assert s_out = std_logic_vector(to_unsigned(test_vector_s(i), 8))
+        report "test vector " & integer'image(i + 1) & " failed: gave s = " & integer'image(to_integer(unsigned(s_out))) & ", should have given s = " & integer'image(test_vector_s(i))
         severity error;
     end loop;
     report"tests complete";

@@ -14,7 +14,7 @@ end haar_butterfly;
 architecture rtl of haar_butterfly is 
     signal a    : signed(8 downto 0);
     signal b    : signed(8 downto 0);
-    signal d    : signed(8 downto 0);what 
+    signal d    : signed(8 downto 0);
     signal s    : unsigned(7 downto 0);
 begin
     a <= signed(resize(unsigned(a_in), 9));

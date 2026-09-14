@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity haar_row_transformer is
+entity haar_row_transform is
   generic (
     MAX_WIDTH  : integer := 8 -- pixels per row
   );
@@ -14,11 +14,11 @@ entity haar_row_transformer is
     s_out     : out std_logic_vector(7 downto 0);
     out_valid : out std_logic
   );
-end haar_row_transformer;
+end haar_row_transform;
 
-architecture rtl of haar_row_transformer is 
+architecture rtl of haar_row_transform is 
 
-  signal pos_counter  : integer range 0 to MAX_WIDTH - 1 := 0;
+  signal row_index  : integer range 0 to MAX_WIDTH - 1 := 0;
 
   component haar_butterfly is
     port(
@@ -48,7 +48,7 @@ begin
   process(clk)  
   begin
     if rising_edge(clk) then 
-      if pos_counter mod 2 = 0 then
+      if row_index mod 2 = 0 then
         out_valid <= '0';
       else
         d_out <= bf_d;
@@ -56,10 +56,10 @@ begin
         out_valid <= '1';
       end if;
       prev_pixel <= pixel_in;
-      if pos_counter = row_width - 1 then
-        pos_counter <= 0;
+      if row_index = row_width - 1 then
+        row_index <= 0;
       else
-        pos_counter <= pos_counter + 1;
+        row_index <= row_index + 1;
       end if;
     end if;
   end process;

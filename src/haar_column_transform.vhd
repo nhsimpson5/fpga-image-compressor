@@ -8,6 +8,7 @@ entity haar_column_transform is
   );
   port(
     clk           : in  std_logic;
+    enable        : in  std_logic;
     column_height : in  integer range 0 to MAX_HEIGHT;
     coeff_in      : in  std_logic_vector(8 downto 0);
     d_out         : out std_logic_vector(9 downto 0); 
@@ -46,19 +47,21 @@ begin
 
   process(clk)  
   begin
-    if rising_edge(clk) then  
-      if column_index mod 2 = 0 then
-        out_valid <= '0';
-      else
-        d_out <= bf_d;
-        s_out <= bf_s;
-        out_valid <= '1';
-      end if;
-      prev_coeff <= coeff_in;
-      if column_index = column_height - 1 then
-        column_index <= 0;
-      else
-        column_index <= column_index + 1;
+    if rising_edge(clk) then
+      if enable = '1' then  
+        if column_index mod 2 = 0 then
+          out_valid <= '0';
+        else
+          d_out <= bf_d;
+          s_out <= bf_s;
+          out_valid <= '1';
+        end if;
+        prev_coeff <= coeff_in;
+        if column_index = column_height - 1 then
+          column_index <= 0;
+        else
+          column_index <= column_index + 1;
+        end if;
       end if;
     end if;
   end process;

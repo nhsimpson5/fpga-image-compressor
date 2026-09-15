@@ -10,6 +10,7 @@ architecture behave of haar_column_transform_tb is
     constant MAX_HEIGHT     : integer := 8; 
     --inputs
     signal CLK              : std_logic := '0';
+    signal enable           : std_logic := '1';
     signal column_height    : integer range 0 to MAX_HEIGHT; 
     signal coeff_in         : std_logic_vector(8 downto 0);
     --outputs
@@ -23,6 +24,7 @@ architecture behave of haar_column_transform_tb is
         );
         port(
             clk             : in  std_logic;
+            enable          : in  std_logic := '0';
             column_height   : in  integer range 0 to MAX_HEIGHT;
             coeff_in        : in  std_logic_vector(8 downto 0);
             d_out           : out std_logic_vector(9 downto 0); 
@@ -97,12 +99,13 @@ begin
         MAX_HEIGHT => MAX_HEIGHT
     )
     port map(
-        clk       => CLK,
-        column_height => column_height,
-        coeff_in  => coeff_in,
-        d_out     => d_out,
-        s_out     => s_out, 
-        out_valid => out_valid
+        clk             => CLK,
+        enable          => enable,
+        column_height   => column_height,
+        coeff_in        => coeff_in,
+        d_out           => d_out,
+        s_out           => s_out, 
+        out_valid       => out_valid
     );
 
     CLK <= not CLK after 10 ns;

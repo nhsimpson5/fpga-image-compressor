@@ -8,6 +8,7 @@ entity haar_row_transform is
   );
   port(
     clk       : in  std_logic;
+    enable    : in  std_logic := '0';
     row_width : in  integer range 0 to MAX_WIDTH;
     pixel_in  : in  std_logic_vector(7 downto 0);
     d_out     : out std_logic_vector(8 downto 0); --signed, extra bit
@@ -39,8 +40,8 @@ begin
 
   bf: haar_butterfly
   port map(
-    a_in => prev_pixel,
-    b_in => pixel_in,
+    a_in  => prev_pixel,
+    b_in  => pixel_in,
     d_out => bf_d,
     s_out => bf_s
   );
@@ -48,18 +49,20 @@ begin
   process(clk)  
   begin
     if rising_edge(clk) then 
-      if row_index mod 2 = 0 then
-        out_valid <= '0';
-      else
-        d_out <= bf_d;
-        s_out <= bf_s;
-        out_valid <= '1';
-      end if;
-      prev_pixel <= pixel_in;
-      if row_index = row_width - 1 then
-        row_index <= 0;
-      else
-        row_index <= row_index + 1;
+      if enable = '1' then
+        if row_index mod 2 = 0 then
+          out_valid <= '0';
+        else
+          d_out <= bf_d;
+          s_out <= bf_s;
+          out_valid <= '1';
+        end if;
+        prev_pixel <= pixel_in;
+        if row_index = row_width - 1 then
+          row_index <= 0;
+        else
+          row_index <= row_index + 1;
+        end if;
       end if;
     end if;
   end process;

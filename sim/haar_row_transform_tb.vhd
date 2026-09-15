@@ -10,6 +10,7 @@ architecture behave of haar_row_transform_tb is
     constant MAX_WIDTH  : integer := 8;
     --inputs
     signal CLK          : std_logic := '0';
+    signal enable       : std_logic := '1';
     signal row_width    : integer range 0 to MAX_WIDTH; 
     signal pixel_in     : std_logic_vector(7 downto 0);
     --outputs
@@ -23,6 +24,7 @@ architecture behave of haar_row_transform_tb is
         );
         port(
             clk         : in  std_logic;
+            enable      : in  std_logic;
             row_width   : in  integer range 0 to MAX_WIDTH;
             pixel_in    : in  std_logic_vector(7 downto 0);
             d_out       : out std_logic_vector(8 downto 0); 
@@ -98,6 +100,7 @@ begin
     )
     port map(
         clk       => CLK,
+        enable    => enable,
         row_width => row_width,
         pixel_in  => pixel_in,
         d_out     => d_out,

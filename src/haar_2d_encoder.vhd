@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;  
 
-entity haar_2d_transform is
+entity haar_2d_encoder is
 generic (
     MAX_WIDTH : integer := 8;
     MAX_HEIGHT : integer := 8
@@ -12,19 +12,53 @@ port (
     row_width       : in  integer range 0 to MAX_WIDTH;
     column_height   : in  integer range 0 to MAX_HEIGHT;
     pixel_in        : in  std_logic_vector(7 downto 0);
+    lh_shift        : in  integer := 0; 
+    ll_shift        : in  integer := 0;
+    hh_shift        : in  integer := 0;
+    hl_shift        : in  integer := 0;
     lh_out          : out std_logic_vector(9 downto 0);
-    ll_out          : out std_logic_vector(8 downto 0);
+    ll_out          : out std_logic_vector(9 downto 0);
     hh_out          : out std_logic_vector(9 downto 0);
-    hl_out          : out std_logic_vector(8 downto 0);
+    hl_out          : out std_logic_vector(9 downto 0);
     lh_valid        : out std_logic;
     ll_valid        : out std_logic;
     hh_valid        : out std_logic;
     hl_valid        : out std_logic
 );
 
-end entity haar_2d_transform;
+end entity haar_2d_encoder;
 
-architecture rtl of haar_2d_transform is
+architecture rtl of haar_2d_encoder is
+
+    type state_type is (ROW_PASS, COLUMN_PASS);
+    type coefficient_row is array (0 to MAX_WIDTH - 1) of std_logic_vector(8 downto 0);
+    type coefficient_array is array (0 to MAX_HEIGHT - 1) of coefficient_row;
+
+    signal state                : state_type := ROW_PASS;
+    signal coefficients         : coefficient_array;
+
+    signal enable_row           : std_logic := '0';
+    signal d_out                : std_logic_vector(8 downto 0);
+    signal s_out                : std_logic_vector(7 downto 0);
+    signal out_valid            : std_logic := '0';
+    
+    signal enable_column        : std_logic := '0';
+    signal coeff_in             : std_logic_vector(8 downto 0);
+    signal d_out_wide           : std_logic_vector(9 downto 0);
+    signal s_out_wide           : std_logic_vector(8 downto 0);
+    signal out_valid_wide       : std_logic := '0';
+
+    signal row_index            : integer range 0 to MAX_HEIGHT     := 0;
+    signal column_index         : integer range 0 to MAX_WIDTH      := 0;
+    signal column_index_shadow  : integer range 0 to MAX_WIDTH      := 0;
+    signal pair_index           : integer range 0 to MAX_WIDTH/2    := 0;
+    signal last_pair            : std_logic := '0';
+
+    signal s_out_wide_ext       : std_logic_vector(9 downto 0);
+    signal shift_a              : integer := 0;
+    signal shift_b              : integer := 0;
+    signal value_a              : std_logic_vector(9 downto 0);
+    signal value_b              : std_logic_vector(9 downto 0);
 
     component haar_row_transform is
         generic (
@@ -56,37 +90,21 @@ architecture rtl of haar_2d_transform is
         );
     end component haar_column_transform;
 
-    type state_type is (ROW_PASS, COLUMN_PASS);
-    type coefficient_row is array (0 to MAX_WIDTH - 1) of std_logic_vector(8 downto 0);
-    type coefficient_array is array (0 to MAX_HEIGHT - 1) of coefficient_row;
-
-    signal state                : state_type := ROW_PASS;
-    signal coefficients         : coefficient_array;
-
-    signal enable_row           : std_logic := '0';
-    signal d_out                : std_logic_vector(8 downto 0);
-    signal s_out                : std_logic_vector(7 downto 0);
-    signal out_valid            : std_logic := '0';
-    
-    signal enable_column        : std_logic := '0';
-    signal coeff_in             : std_logic_vector(8 downto 0);
-    signal d_out_wide           : std_logic_vector(9 downto 0);
-    signal s_out_wide           : std_logic_vector(8 downto 0);
-    signal out_valid_wide       : std_logic := '0';
-
-    signal row_index            : integer range 0 to MAX_HEIGHT  := 0;
-    signal column_index         : integer range 0 to MAX_WIDTH   := 0;
-    signal column_index_shadow  : integer range 0 to MAX_WIDTH := 0;
-    signal pair_index           : integer range 0 to MAX_WIDTH/2 := 0;
-    signal last_pair            : std_logic := '0';
+    component haar_quantizer is 
+        port(
+            value_in    : in std_logic_vector(9 downto 0);
+            shift       : in integer := 0;
+            value_out   : out std_logic_vector(9 downto 0)
+        );
+    end component haar_quantizer;
     
 begin
 
     bf_row: haar_row_transform
-     generic map(
-        MAX_WIDTH => MAX_WIDTH
+    generic map(
+        MAX_WIDTH   => MAX_WIDTH
     )
-     port map(
+    port map(
         clk         => clk,
         enable      => enable_row,
         row_width   => row_width,
@@ -97,8 +115,8 @@ begin
     ); 
     
     bf_column: haar_column_transform
-     generic map(
-        MAX_HEIGHT => MAX_HEIGHT
+    generic map(
+        MAX_HEIGHT      => MAX_HEIGHT
     )
     port map(
         clk             => clk,
@@ -110,9 +128,27 @@ begin
         out_valid       => out_valid_wide
     );
     
+    bf_quantizer_a: haar_quantizer
+    port map(
+        value_in    => d_out_wide,
+        shift       => shift_a,
+        value_out   => value_a
+    );
+
+    bf_quantizer_b: haar_quantizer
+    port map(
+        value_in    => s_out_wide_ext,
+        shift       => shift_b,
+        value_out   => value_b
+    );
+
     enable_row          <= '1' when state = ROW_PASS    else '0';
     enable_column       <= '1' when state = COLUMN_PASS else '0';
     coeff_in            <= coefficients(row_index)(column_index);
+    s_out_wide_ext      <= std_logic_vector(resize(signed(s_out_wide), 10));
+    shift_a <= lh_shift when column_index_shadow < row_width/2 else hh_shift;
+    shift_b <= ll_shift when column_index_shadow < row_width/2 else hl_shift;
+     
 
 process(clk) 
 begin
@@ -148,14 +184,14 @@ begin
             when COLUMN_PASS =>
                 if out_valid_wide ='1' then
                     if column_index_shadow < row_width/2 then
-                            lh_out      <= d_out_wide;
+                            lh_out      <= value_a;
                             lh_valid    <= '1';
-                            ll_out      <= s_out_wide;
+                            ll_out      <= value_b;
                             ll_valid    <= '1';
                         else
-                            hh_out      <= d_out_wide;
+                            hh_out      <= value_a;
                             hh_valid    <= '1';
-                            hl_out      <= s_out_wide;
+                            hl_out      <= value_b;
                             hl_valid    <= '1';
                         end if;
                 else

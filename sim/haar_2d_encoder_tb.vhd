@@ -2,10 +2,10 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity haar_2d_transform_tb is
-end haar_2d_transform_tb;
+entity haar_2d_encoder_tb is
+end haar_2d_encoder_tb;
 
-architecture behave of haar_2d_transform_tb is
+architecture behave of haar_2d_encoder_tb is
     constant MAX_WIDTH      : integer := 8;
     constant MAX_HEIGHT     : integer := 8;
 
@@ -13,16 +13,20 @@ architecture behave of haar_2d_transform_tb is
     signal row_width        : integer range 0 to MAX_WIDTH  := 8;
     signal column_height    : integer range 0 to MAX_HEIGHT := 8;
     signal pixel_in         : std_logic_vector(7 downto 0);
+    signal lh_shift         : integer := 0;
+    signal ll_shift         : integer := 0;
+    signal hh_shift         : integer := 0;
+    signal hl_shift         : integer := 0;
     signal lh_out           : std_logic_vector(9 downto 0);
-    signal ll_out           : std_logic_vector(8 downto 0);
+    signal ll_out           : std_logic_vector(9 downto 0);
     signal hh_out           : std_logic_vector(9 downto 0);
-    signal hl_out           : std_logic_vector(8 downto 0);
+    signal hl_out           : std_logic_vector(9 downto 0);
     signal lh_valid         : std_logic;
     signal ll_valid         : std_logic;
     signal hh_valid         : std_logic;
     signal hl_valid         : std_logic;
 
-    component haar_2d_transform is
+    component haar_2d_encoder is
         generic (
             MAX_WIDTH       : integer := 8; MAX_HEIGHT : integer := 8
         );
@@ -31,10 +35,14 @@ architecture behave of haar_2d_transform_tb is
             row_width       : in  integer range 0 to MAX_WIDTH;
             column_height   : in  integer range 0 to MAX_HEIGHT;
             pixel_in        : in  std_logic_vector(7 downto 0);
+            lh_shift        : in  integer; 
+            ll_shift        : in  integer;
+            hh_shift        : in  integer;
+            hl_shift        : in  integer;
             lh_out          : out std_logic_vector(9 downto 0);
-            ll_out          : out std_logic_vector(8 downto 0);
+            ll_out          : out std_logic_vector(9 downto 0);
             hh_out          : out std_logic_vector(9 downto 0);
-            hl_out          : out std_logic_vector(8 downto 0);
+            hl_out          : out std_logic_vector(9 downto 0);
             lh_valid        : out std_logic;
             ll_valid        : out std_logic;
             hh_valid        : out std_logic;
@@ -61,39 +69,43 @@ architecture behave of haar_2d_transform_tb is
     constant lh_exp : expected_vector := (
         (0,0,0,0),
         (0,0,0,0),
-        (-140,-140,0,0),
-        (-140,-140,0,0)
+        (-18,-18,0,0),
+        (-18,-18,0,0)
     );
     constant ll_exp : expected_vector := (
-        (128,128,80,160),
-        (128,128,80,160),
-        (130,130,130,130),
-        (130,130,130,130)
-    ); 
+        (32,32,20,40),
+        (32,32,20,40),
+        (32,32,32,32),
+        (32,32,32,32)
+    );
     constant hh_exp : expected_vector := (
         (0,0,0,0),
         (0,0,0,0),
-        (0,0,-280,-280),
-        (0,0,-280,-280)
+        (0,0,-18,-18),
+        (0,0,-18,-18)
     );
     constant hl_exp : expected_vector := (
-        (0,0,-40,-40),
-        (0,0,-40,-40),
+        (0,0,-5,-5),
+        (0,0,-5,-5),
         (0,0,0,0),
         (0,0,0,0)
     );
 
 begin
-
-    uut: haar_2d_transform
+    uut: haar_2d_encoder
     generic map (
         MAX_WIDTH       => MAX_WIDTH, 
-        MAX_HEIGHT      => MAX_HEIGHT)
+        MAX_HEIGHT      => MAX_HEIGHT
+    )
     port map (
         clk             => clk, 
         row_width       => row_width, 
         column_height   => column_height,
         pixel_in        => pixel_in,
+        lh_shift        => lh_shift,
+        ll_shift        => ll_shift,
+        hh_shift        => hh_shift,
+        hl_shift        => hl_shift,
         lh_out          => lh_out, 
         ll_out          => ll_out, 
         hh_out          => hh_out, 
@@ -104,7 +116,11 @@ begin
         hl_valid        => hl_valid
     );
 
-    clk <= not clk after 10 ns;
+    clk         <= not clk after 10 ns;
+    lh_shift    <= 3;
+    ll_shift    <= 2;
+    hh_shift    <= 4;
+    hl_shift    <= 3; 
     
 stream_pixels: process
 begin
@@ -173,10 +189,5 @@ begin
         end if;
     end loop;
 end process;
-
-    -- TODO: stimulus process — feed src pixel-by-pixel in raster order,
-    -- then keep clocking long enough for COLUMN_PASS to drain
-
-    -- TODO: checking process(es) for ll_valid/lh_valid and hl_valid/hh_valid
 
 end behave;

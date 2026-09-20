@@ -1,6 +1,6 @@
 # FPGA Image Compressor
 
-A from-scratch FPGA-based image compressor, written in VHDL and verified in simulation with GHDL. This is a personal project built to demonstrate hardware design skills for placement interviews — it's deliberately treated as an honest work-in-progress rather than a polished, finished product, with design decisions, dead ends, and trade-offs documented as they happen.
+A from-scratch FPGA-based image compressor, written in VHDL and verified in simulation with GHDL. This is a personal project built to demonstrate hardware design skills, it's deliberately treated as an honest work-in-progress rather than a polished, finished product, with design decisions, dead ends, and trade-offs documented as they happen.
 
 ## Overview
 

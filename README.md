@@ -1,6 +1,6 @@
 # FPGA Image Compressor
 
-A from-scratch FPGA-based image compressor, written in VHDL and verified in simulation with GHDL. This is a personal project built to demonstrate hardware design skills for placement interviews — it's deliberately treated as an honest work-in-progress rather than a polished, finished product, with design decisions, dead ends, and trade-offs documented as they happen.
+A from-scratch FPGA-based image compressor, written in VHDL and verified in simulation with GHDL. This is a personal project built to demonstrate hardware design skills, it's deliberately treated as an honest work-in-progress rather than a polished, finished product, with design decisions, dead ends, and trade-offs documented as they happen.
 
 ## Overview
 
@@ -28,7 +28,11 @@ Within Stage 3: the single-level 2D Haar transform and quantization are complete
 
 ## Architecture
 
-![Architecture diagram: a .pgm image is read via TEXTIO and streamed through haar_2d_encoder's row pass, column pass, and two quantizers, producing LH/HH detail and LL/HL approximation subbands; these still need to be wired into rle_encoder (shown dashed) to produce the .rle output](architecture.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="architecture-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="architecture-light.svg">
+  <img alt="Architecture diagram: a .pgm image is read via TEXTIO and streamed through haar_2d_encoder's row pass, column pass, and two quantizers, producing LH/HH detail and LL/HL approximation subbands; these still need to be wired into rle_encoder (shown dashed) to produce the .rle output" src="architecture-light.svg">
+</picture>
 
 *(Dashed arrows mark the RLE hookup that's still being wired in — see [Known gaps](#known-gaps--next-steps).)*
 

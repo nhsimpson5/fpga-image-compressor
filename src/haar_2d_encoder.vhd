@@ -60,50 +60,9 @@ architecture rtl of haar_2d_encoder is
     signal value_a              : std_logic_vector(9 downto 0);
     signal value_b              : std_logic_vector(9 downto 0);
 
-
-    component haar_row_transform is
-        generic (
-            MAX_WIDTH  : integer := MAX_WIDTH
-        );
-        port(
-            clk         : in  std_logic;
-            enable      : in  std_logic;
-            row_width   : in  integer range 0 to MAX_WIDTH;
-            pixel_in    : in  std_logic_vector(7 downto 0);
-            d_out       : out std_logic_vector(8 downto 0); --signed, extra bit
-            s_out       : out std_logic_vector(7 downto 0);
-            out_valid   : out std_logic
-        );
-    end component haar_row_transform;
-
-
-    component haar_column_transform is 
-        generic (
-            MAX_HEIGHT  : integer := MAX_HEIGHT
-        );
-        port(
-            clk             : in  std_logic;
-            enable          : in  std_logic;
-            column_height   : in  integer range 0 to MAX_HEIGHT;
-            coeff_in        : in  std_logic_vector(8 downto 0);
-            d_out           : out std_logic_vector(9 downto 0); 
-            s_out           : out std_logic_vector(8 downto 0);
-            out_valid       : out std_logic
-        );
-    end component haar_column_transform;
-
-
-    component haar_quantizer is 
-        port(
-            value_in    : in std_logic_vector(9 downto 0);
-            shift       : in integer := 0;
-            value_out   : out std_logic_vector(9 downto 0)
-        );
-    end component haar_quantizer;
-
 begin
 
-    bf_row: haar_row_transform
+    bf_row: entity work.haar_row_transform
     generic map(
         MAX_WIDTH   => MAX_WIDTH
     )
@@ -117,7 +76,7 @@ begin
         out_valid   => out_valid
     ); 
     
-    bf_column: haar_column_transform
+    bf_column: entity work.haar_column_transform
     generic map(
         MAX_HEIGHT      => MAX_HEIGHT
     )
@@ -131,14 +90,14 @@ begin
         out_valid       => out_valid_wide
     );
     
-    bf_quantizer_a: haar_quantizer
+    bf_quantizer_a: entity work.haar_quantizer
     port map(
         value_in    => d_out_wide,
         shift       => shift_a,
         value_out   => value_a
     );
 
-    bf_quantizer_b: haar_quantizer
+    bf_quantizer_b: entity work.haar_quantizer
     port map(
         value_in    => s_out_wide_ext,
         shift       => shift_b,

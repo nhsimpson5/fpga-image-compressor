@@ -26,30 +26,6 @@ architecture behave of haar_2d_encoder_tb is
     signal hh_valid         : std_logic;
     signal hl_valid         : std_logic;
 
-    component haar_2d_encoder is
-        generic (
-            MAX_WIDTH       : integer := 8; MAX_HEIGHT : integer := 8
-        );
-        port (
-            clk             : in  std_logic;
-            row_width       : in  integer range 0 to MAX_WIDTH;
-            column_height   : in  integer range 0 to MAX_HEIGHT;
-            pixel_in        : in  std_logic_vector(7 downto 0);
-            lh_shift        : in  integer; 
-            ll_shift        : in  integer;
-            hh_shift        : in  integer;
-            hl_shift        : in  integer;
-            lh_out          : out std_logic_vector(9 downto 0);
-            ll_out          : out std_logic_vector(9 downto 0);
-            hh_out          : out std_logic_vector(9 downto 0);
-            hl_out          : out std_logic_vector(9 downto 0);
-            lh_valid        : out std_logic;
-            ll_valid        : out std_logic;
-            hh_valid        : out std_logic;
-            hl_valid        : out std_logic
-        );
-    end component;
-
     type test_row is array (0 to 7) of integer;
     type test_vector is array (0 to 7) of test_row;
     type expected_row is array (0 to 3) of integer;
@@ -92,7 +68,7 @@ architecture behave of haar_2d_encoder_tb is
     );
 
 begin
-    uut: haar_2d_encoder
+    uut: entity work.haar_2d_encoder
     generic map (
         MAX_WIDTH       => MAX_WIDTH, 
         MAX_HEIGHT      => MAX_HEIGHT

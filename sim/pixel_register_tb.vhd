@@ -11,13 +11,6 @@ architecture behave of pixel_register_tb is
     signal D    : std_logic_vector(7 downto 0);
     --Outputs
     signal Q    :std_logic_vector(7 downto 0);
-    
-    component pixel_register is 
-        port(
-            clk : in  std_logic;
-            d   : in  std_logic_vector(7 downto 0);
-            q   : out std_logic_vector(7 downto 0));
-    end component pixel_register;
 
     --Tests
     type test_array is array (natural range <>) of std_logic_vector(7 downto 0);
@@ -26,7 +19,7 @@ architecture behave of pixel_register_tb is
     "00010000", "00100000", "01000000", "10000000", "11111111"
     );
 begin
-    uut: pixel_register
+    uut: entity work.pixel_register
         port map (
             clk => CLK,
             d => D,

@@ -18,22 +18,6 @@ architecture tb of subband_transpose_buffer_tb is
     signal data_out         : std_logic_vector(9 downto 0);
     signal valid_out        : std_logic;
 
-    component subband_transpose_buffer is
-        generic (
-            MAX_WIDTH       : integer := 8;
-            MAX_HEIGHT      : integer := 8
-        );
-        port (
-            clk             : in  std_logic;
-            row_width       : in  integer range 0 to MAX_WIDTH;
-            column_height   : in  integer range 0 to MAX_HEIGHT;
-            data_in         : in  std_logic_vector(9 downto 0);
-            valid_in        : in  std_logic;
-            data_out        : out std_logic_vector(9 downto 0);
-            valid_out       : out std_logic
-        );
-    end component subband_transpose_buffer;
-
     type test_row is array (0 to MAX_WIDTH - 1) of integer;
     type test_vector is array (natural range <>) of test_row;
     
@@ -64,7 +48,7 @@ architecture tb of subband_transpose_buffer_tb is
 
 begin
 
-    uut: subband_transpose_buffer
+    uut: entity work.subband_transpose_buffer
     generic map (
         MAX_WIDTH       => MAX_WIDTH,
         MAX_HEIGHT      => MAX_HEIGHT

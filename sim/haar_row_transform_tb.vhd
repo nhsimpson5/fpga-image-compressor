@@ -18,21 +18,6 @@ architecture behave of haar_row_transform_tb is
     signal s_out        : std_logic_vector(7 downto 0);
     signal out_valid    : std_logic;
 
-    component haar_row_transform is
-        generic (
-            MAX_WIDTH   : integer := 8 --pixels per row
-        );
-        port(
-            clk         : in  std_logic;
-            enable      : in  std_logic;
-            row_width   : in  integer range 0 to MAX_WIDTH;
-            pixel_in    : in  std_logic_vector(7 downto 0);
-            d_out       : out std_logic_vector(8 downto 0); 
-            s_out       : out std_logic_vector(7 downto 0);
-            out_valid   : out std_logic
-        );
-    end component haar_row_transform;
-
     --test vectors
     type test_vector is array (natural range <>) of integer;
 
@@ -94,7 +79,7 @@ architecture behave of haar_row_transform_tb is
     end procedure;
 
 begin
-    uut: haar_row_transform
+    uut: entity work.haar_row_transform
     generic map(
         MAX_WIDTH => MAX_WIDTH
     )

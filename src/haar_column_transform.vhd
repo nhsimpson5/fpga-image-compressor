@@ -20,15 +20,6 @@ end haar_column_transform;
 architecture rtl of haar_column_transform is 
 
   signal column_index  : integer range 0 to MAX_HEIGHT - 1 := 0;
-  
-  component haar_butterfly_wide is
-    port(
-      a_in    : in std_logic_vector(8 downto 0);
-      b_in    : in std_Logic_vector(8 downto 0);
-      d_out   : out std_logic_vector(9 downto 0); 
-      s_out   : out std_logic_vector(8 downto 0)
-    );
-    end component haar_butterfly_wide;
 
   --bf internal signals
   signal prev_coeff       : std_logic_vector(8 downto 0);
@@ -37,7 +28,7 @@ architecture rtl of haar_column_transform is
 
 begin
 
-  bf: haar_butterfly_wide
+  bf: entity work.haar_butterfly_wide
   port map(
     a_in  => prev_coeff,
     b_in  => coeff_in,

@@ -20,23 +20,6 @@ architecture behave of rle_encoder_tb is
     signal out_valid : std_logic;
     signal pairs_seen : integer := 0;
 
-    component rle_encoder is
-        generic (
-            MAX_WIDTH  : integer := 8;
-            COUNT_BITS : integer := 5;
-            DATA_WIDTH : integer := 10
-        );
-        port (
-            clk       : in  std_logic;
-            row_width : in  integer range 0 to MAX_WIDTH;
-            value_in  : in  std_logic_vector(DATA_WIDTH - 1 downto 0);
-            valid_in  : in  std_logic;
-            value_out : out std_logic_vector(DATA_WIDTH - 1 downto 0);
-            count_out : out std_logic_vector(COUNT_BITS - 1 downto 0);
-            out_valid : out std_logic
-        );
-    end component rle_encoder;
-
     type test_row    is array (0 to MAX_WIDTH - 1) of integer;
     type test_vector is array (natural range <>) of test_row;
     type int_array   is array (natural range <>) of integer;
@@ -59,7 +42,7 @@ architecture behave of rle_encoder_tb is
 
 begin
 
-    uut: rle_encoder
+    uut: entity work.rle_encoder
     generic map (
         MAX_WIDTH  => MAX_WIDTH,
         COUNT_BITS => COUNT_BITS,

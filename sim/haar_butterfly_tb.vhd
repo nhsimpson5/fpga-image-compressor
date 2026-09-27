@@ -13,15 +13,6 @@ architecture behave of haar_butterfly_tb is
     signal d_out: std_logic_vector(8 downto 0); --signed, extra bit
     signal s_out: std_logic_vector(7 downto 0);
 
-    component haar_butterfly is
-        port(
-            a_in    : in std_logic_vector(7 downto 0); 
-            b_in    : in std_logic_vector(7 downto 0);
-            d_out   : out std_logic_vector(8 downto 0); --signed, extra bit
-            s_out   : out std_logic_vector(7 downto 0) 
-        );
-        end component haar_butterfly;
-
     -- test arrays
     type test_vector is array (natural range <>) of integer;
     
@@ -39,7 +30,7 @@ architecture behave of haar_butterfly_tb is
     );
     
 begin
-    uut: haar_butterfly
+    uut: entity work.haar_butterfly
     port map(
         a_in => a_in,
         b_in => b_in,

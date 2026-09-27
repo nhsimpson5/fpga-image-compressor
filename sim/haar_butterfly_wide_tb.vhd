@@ -12,15 +12,6 @@ architecture behave of haar_butterfly_wide_tb is
     --outputs
     signal d_out: std_logic_vector(9 downto 0); 
     signal s_out: std_logic_vector(8 downto 0);
-
-    component haar_butterfly_wide is
-        port(
-            a_in    : in std_logic_vector(8 downto 0); 
-            b_in    : in std_logic_vector(8 downto 0);
-            d_out   : out std_logic_vector(9 downto 0); 
-            s_out   : out std_logic_vector(8 downto 0) 
-        );
-        end component haar_butterfly_wide;
     
     -- test arrays
     type test_vector is array (natural range <>) of integer;
@@ -39,7 +30,7 @@ architecture behave of haar_butterfly_wide_tb is
     );
     
 begin
-    uut: haar_butterfly_wide
+    uut: entity work.haar_butterfly_wide
     port map(
         a_in => a_in,
         b_in => b_in,

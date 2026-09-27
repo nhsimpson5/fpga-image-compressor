@@ -10,14 +10,6 @@ architecture behave of haar_quantizer_tb is
     signal shift        : integer := 0;
     signal value_out    : std_logic_vector(9 downto 0);
 
-    component haar_quantizer is
-        port(
-            value_in    : in std_logic_vector(9 downto 0);
-            shift       : in integer := 0;
-            value_out   : out std_logic_vector(9 downto 0)
-        );
-    end component haar_quantizer;
-
     type test_vector is array (natural range <>) of integer;
 
     constant test_value : test_vector := (
@@ -33,7 +25,7 @@ architecture behave of haar_quantizer_tb is
     );
 
 begin
-    uut: haar_quantizer 
+    uut: entity work.haar_quantizer 
         port map(
             value_in    => value_in,
             shift       => shift,

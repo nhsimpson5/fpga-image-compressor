@@ -18,21 +18,6 @@ architecture behave of haar_column_transform_tb is
     signal s_out            : std_logic_vector(8 downto 0);
     signal out_valid        : std_logic;
 
-    component haar_column_transform is
-        generic (
-            MAX_HEIGHT      : integer := 8 --coefficients per column
-        );
-        port(
-            clk             : in  std_logic;
-            enable          : in  std_logic := '0';
-            column_height   : in  integer range 0 to MAX_HEIGHT;
-            coeff_in        : in  std_logic_vector(8 downto 0);
-            d_out           : out std_logic_vector(9 downto 0); 
-            s_out           : out std_logic_vector(8 downto 0);
-            out_valid       : out std_logic
-        );
-    end component haar_column_transform;
-
     --test vectors
     type test_vector is array (natural range <>) of integer;
 
@@ -94,7 +79,7 @@ architecture behave of haar_column_transform_tb is
     end procedure;
 
 begin
-    uut: haar_column_transform
+    uut: entity work.haar_column_transform
     generic map(
         MAX_HEIGHT => MAX_HEIGHT
     )

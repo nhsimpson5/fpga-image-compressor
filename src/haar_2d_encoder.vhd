@@ -4,8 +4,8 @@ use ieee.numeric_std.all;
 
 entity haar_2d_encoder is
 generic (
-    MAX_WIDTH : integer := 8;
-    MAX_HEIGHT : integer := 8
+    MAX_WIDTH       : integer := 8;
+    MAX_HEIGHT      : integer := 8
 );
 port (
     clk             : in  std_logic;
@@ -60,35 +60,38 @@ architecture rtl of haar_2d_encoder is
     signal value_a              : std_logic_vector(9 downto 0);
     signal value_b              : std_logic_vector(9 downto 0);
 
+
     component haar_row_transform is
         generic (
-            MAX_WIDTH  : integer := 8 -- pixels per row
+            MAX_WIDTH  : integer := MAX_WIDTH
         );
         port(
-            clk       : in  std_logic;
-            enable    : in  std_logic;
-            row_width : in  integer range 0 to MAX_WIDTH;
-            pixel_in  : in  std_logic_vector(7 downto 0);
-            d_out     : out std_logic_vector(8 downto 0); --signed, extra bit
-            s_out     : out std_logic_vector(7 downto 0);
-            out_valid : out std_logic
+            clk         : in  std_logic;
+            enable      : in  std_logic;
+            row_width   : in  integer range 0 to MAX_WIDTH;
+            pixel_in    : in  std_logic_vector(7 downto 0);
+            d_out       : out std_logic_vector(8 downto 0); --signed, extra bit
+            s_out       : out std_logic_vector(7 downto 0);
+            out_valid   : out std_logic
         );
     end component haar_row_transform;
 
+
     component haar_column_transform is 
         generic (
-            MAX_HEIGHT  : integer := 8 --coefficients per column
+            MAX_HEIGHT  : integer := MAX_HEIGHT
         );
         port(
-            clk           : in  std_logic;
-            enable        : in  std_logic;
-            column_height : in  integer range 0 to MAX_HEIGHT;
-            coeff_in      : in  std_logic_vector(8 downto 0);
-            d_out         : out std_logic_vector(9 downto 0); 
-            s_out         : out std_logic_vector(8 downto 0);
-            out_valid     : out std_logic
+            clk             : in  std_logic;
+            enable          : in  std_logic;
+            column_height   : in  integer range 0 to MAX_HEIGHT;
+            coeff_in        : in  std_logic_vector(8 downto 0);
+            d_out           : out std_logic_vector(9 downto 0); 
+            s_out           : out std_logic_vector(8 downto 0);
+            out_valid       : out std_logic
         );
     end component haar_column_transform;
+
 
     component haar_quantizer is 
         port(
@@ -97,7 +100,7 @@ architecture rtl of haar_2d_encoder is
             value_out   : out std_logic_vector(9 downto 0)
         );
     end component haar_quantizer;
-    
+
 begin
 
     bf_row: haar_row_transform

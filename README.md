@@ -19,7 +19,7 @@ Everything is written and verified module-by-module in simulation before anythin
 | 1 | Read a real image into simulation and write it back out unchanged (PGM + TEXTIO) | [x] Done |
 | 2 | Run-Length Encoding, verified in simulation | [x] Done |
 | 3 | Haar wavelet transform-based compressor (quantize, measure ratio/PSNR) | [ ] In progress |
-| 4 | Block-based DCT compressor, for comparison (stretch) | [ ] Not started |
+| 4 | Block-based DCT compressor, for comparison (optional) | [ ] Not started |
 | 5 | Run the working compressor on real FPGA hardware | [ ] Not started |
 | 6 | Full write-up: diagrams, before/after images, ratio/PSNR numbers | [ ] Ongoing |
  

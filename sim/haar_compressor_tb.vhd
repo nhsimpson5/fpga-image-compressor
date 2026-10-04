@@ -11,14 +11,11 @@ architecture behave of haar_compressor_tb is
     constant MAX_HEIGHT : integer := 8;
     constant COUNT_BITS : integer := 5;
 
-    signal clk            : std_logic := '0';
-    signal row_width      : integer range 0 to MAX_WIDTH  := MAX_WIDTH;
-    signal column_height  : integer range 0 to MAX_HEIGHT := MAX_HEIGHT;
-    signal pixel_in       : std_logic_vector(7 downto 0);
-    signal lh_shift       : integer := 3;
-    signal ll_shift       : integer := 2;
-    signal hh_shift       : integer := 4;
-    signal hl_shift       : integer := 3;
+    signal clk                                          : std_logic := '0';
+    signal row_width                                    : integer range 0 to MAX_WIDTH  := MAX_WIDTH;
+    signal column_height                                : integer range 0 to MAX_HEIGHT := MAX_HEIGHT;
+    signal pixel_in                                     : std_logic_vector(7 downto 0);
+    signal lh_shift, ll_shift, hh_shift, hl_shift       : integer := 0;
 
     signal lh_value_out   : std_logic_vector(9 downto 0);
     signal lh_count_out   : std_logic_vector(COUNT_BITS - 1 downto 0);
@@ -100,6 +97,12 @@ begin
 
     clk <= not clk after 10 ns;
 
+    --set subband shift values
+    lh_shift <= 3;
+    ll_shift <= 2;
+    hl_shift <= 4;
+    hh_shift <= 3;
+    
     stimulus: process
     begin
         for i in 0 to column_height-1 loop

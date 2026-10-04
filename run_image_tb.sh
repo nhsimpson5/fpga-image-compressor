@@ -1,18 +1,14 @@
 #!/bin/bash
-# Usage: ./run_tb.sh <module_name> [stop_time]
-# e.g.:  ./run_tb.sh haar_rle_encoder
+# Usage: ./run_image_tb.sh
+# e.g.:  ./run_image_tb.sh
 set -e
 
-MODULE=$1
-WORKDIR=build
+TB=${1:-haar_compressor_image_tb}
 STOP_TIME=${2:-100000ns}
-
-if [ -z "$MODULE" ]; then
-    echo "Usage: ./run_tb.sh <module_name> [stop_time]"
-    exit 1
-fi
+WORKDIR=build
 
 mkdir -p $WORKDIR
+mkdir -p sim/output
 
 SRC_FILES=(
     pixel_register
@@ -31,6 +27,6 @@ for f in "${SRC_FILES[@]}"; do
     ghdl -a --workdir=$WORKDIR src/${f}.vhd
 done
 
-ghdl -a --workdir=$WORKDIR sim/${MODULE}_tb.vhd
-ghdl -e --workdir=$WORKDIR ${MODULE}_tb
-ghdl -r --workdir=$WORKDIR ${MODULE}_tb --stop-time=$STOP_TIME
+ghdl -a --workdir=$WORKDIR sim/${TB}.vhd
+ghdl -e --workdir=$WORKDIR ${TB}
+ghdl -r --workdir=$WORKDIR ${TB} --stop-time=$STOP_TIME
